@@ -26,6 +26,15 @@ void handle_shownum(int client_sock) {
     write(client_sock, response_buff, strlen(response_buff));
 }
 
+void handle_increment(int client_sock) {
+    char response_buff[BUFFER_SIZE];
+    global_num += 1;
+    snprintf(response_buff, BUFFER_SIZE, "Number incremented by 1. New number is %d\r\n", global_num);
+
+    write(client_sock, HTTP_200_OK, strlen(HTTP_200_OK));
+    write(client_sock, response_buff, strlen(response_buff));
+}
+
 void handle_response(char *request, int client_sock) {
     char url[256];
 
@@ -39,8 +48,10 @@ void handle_response(char *request, int client_sock) {
     printf("SERVER LOG: Url is \"%s\"\n", url);
 
     // show number path
-    if (strncmp(url, "/shownum", 8)) { // if url starts with shownum
+    if (strstr(url, "/shownum")) { // if url starts with shownum
         handle_shownum(client_sock);
+    }else if (strstr(url, "/increment")) {
+        handle_increment(client_sock);
     } else {
         handle_404(client_sock, url);
     }

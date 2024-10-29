@@ -6,11 +6,11 @@ char const HTTP_404_NOT_FOUND[] = "HTTP/1.1 404 Not Found\r\nContent-Type: text/
 
 int global_num = 0; // Persistent server state
 
-void handle_404(int client_sock, char *url)  {
-    printf("SERVER LOG: Got request for unrecognized url \"%s\"\n", url);
+void handle_404(int client_sock, char *path)  {
+    printf("SERVER LOG: Got request for unrecognized path \"%s\"\n", path);
 
     char response_buff[BUFFER_SIZE];
-    snprintf(response_buff, BUFFER_SIZE, "Error 404:\r\nUnrecognized url \"%s\"\r\n", url);
+    snprintf(response_buff, BUFFER_SIZE, "Error 404:\r\nUnrecognized path \"%s\"\r\n", path);
     // snprintf includes a null-terminator
 
     write(client_sock, HTTP_404_NOT_FOUND, strlen(HTTP_404_NOT_FOUND));
@@ -27,22 +27,22 @@ void handle_shownum(int client_sock) {
 }
 
 void handle_response(char *request, int client_sock) {
-    char url[256];
+    char path[256];
 
     printf("\nSERVER LOG: Got request \"%s\"\n", request);
 
-    // Parse the url out of the request line (limit buffer size; sscanf null-terminates)
-    if (sscanf(request, "GET %255s", url) != 1) {
+    // Parse the path out of the request line (limit buffer size; sscanf null-terminates)
+    if (sscanf(request, "GET %255s", path) != 1) {
         printf("Invalid request line\n");
         return;
     }
-    printf("SERVER LOG: Url is \"%s\"\n", url);
+    printf("SERVER LOG: path is \"%s\"\n", path);
 
     // show number path
-    if (strncmp(url, "/shownum", 8)) { // if url starts with shownum
+    if (strncmp(path, "/shownum", 8)) { // if path starts with shownum
         handle_shownum(client_sock);
     } else {
-        handle_404(client_sock, url);
+        handle_404(client_sock, path);
     }
 }
 
